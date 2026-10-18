@@ -1,0 +1,18 @@
+{
+  "weights": {
+    "meetsRequirements": 35,
+    "evidenceQuality": 25,
+    "conditionTransparency": 20,
+    "priceValueRatio": 20
+  },
+  "evidenceBonus": {
+    "verified": 25,
+    "pending_review": 12,
+    "none": 0
+  },
+  "disclosurePenalties": {
+    "missingBatteryHealth": -8,
+    "unspecifiedDefects": -5,
+    "missingPurchaseInvoice": -4
+  }
+}

@@ -1,0 +1,149 @@
+openapi: 3.0.3
+info:
+  title: Preowned Tech Buying Companion REST API
+  description: Secure API for preowned laptop, camera, and gaming device marketplace with AI discovery and RAG.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000/api
+    description: Local Development Server
+
+paths:
+  /auth/register:
+    post:
+      summary: Register new buyer or seller account
+      description: Rejects moderator role self-assignment; dispatches single-use expiring verification link.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name: { type: string }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                role: { type: string, enum: [buyer, seller], default: buyer }
+      responses:
+        '201':
+          description: Registration successful, verification pending
+        '400':
+          description: Validation error or illegal role escalation attempt
+
+  /auth/login:
+    post:
+      summary: Authenticate user session
+      description: Session cookie authenticated with rate limiting.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        '200':
+          description: Authentication successful
+        '401':
+          description: Invalid email or password
+
+  /auth/verify-email:
+    get:
+      summary: Verify account using single-use cryptographic token
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Email verified successfully
+        '400':
+          description: Token invalid or expired
+
+  /listings:
+    get:
+      summary: Public approved active listings
+      description: Filtered search returning safe public projections.
+      parameters:
+        - in: query
+          name: category
+          schema: { type: string, enum: [laptop, camera, gaming_device] }
+        - in: query
+          name: search
+          schema: { type: string }
+        - in: query
+          name: minPrice
+          schema: { type: number }
+        - in: query
+          name: maxPrice
+          schema: { type: number }
+        - in: query
+          name: minRam
+          schema: { type: number }
+      responses:
+        '200':
+          description: List of active listings
+
+    post:
+      summary: Create new listing (Seller only)
+      responses:
+        '201':
+          description: Listing draft created
+
+  /listings/{id}:
+    get:
+      summary: Public listing detail with structured specs & safe evidence status
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Detailed listing specification
+
+  /comparison-agent:
+    post:
+      summary: Purposeful multi-tool comparison agent
+      description: Runs discovery, spec comparison, disclosure inspection, and grounded RAG citations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [prompt]
+              properties:
+                prompt: { type: string }
+                budget: { type: number }
+                category: { type: string }
+      responses:
+        '200':
+          description: Structured 5-part comparison analysis
+
+  /buyer-chat:
+    post:
+      summary: AI-assisted grounded chat
+      responses:
+        '200':
+          description: Grounded conversational answer with verified citation chips
+
+  /moderator/queue/submitted:
+    get:
+      summary: Submitted listings awaiting review (Moderator only)
+      responses:
+        '200':
+          description: Moderation queue items
+        '403':
+          description: Forbidden for non-moderators
+
+  /moderator/listings/{id}/moderation:
+    post:
+      summary: Record auditable moderation decision (Moderator only)
+      responses:
+        '201':
+          description: Immutable moderation event created

@@ -1,0 +1,17 @@
+{
+  "name": "preowned-tech-companion",
+  "version": "1.0.0",
+  "description": "Preowned Tech Buying Companion - Capstone Project",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "start": "npm run start --prefix server",
+    "seed": "npm run seed --prefix server",
+    "create-moderator": "npm run create-moderator --prefix server",
+    "test": "npm run test --prefix server",
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
